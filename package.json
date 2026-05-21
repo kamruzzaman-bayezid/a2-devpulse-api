@@ -1,0 +1,24 @@
+{
+  "name": "a2-devpulse-api",
+  "version": "1.0.0",
+  "description": "A professional backend for DevPulse – Internal Tech Issue & Feature Tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch ./src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
