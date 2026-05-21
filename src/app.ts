@@ -1,7 +1,12 @@
-import express, { type Request, type Response } from "express";
+import express, {
+  type Application,
+  type Request,
+  type Response,
+} from "express";
 import notFoundHandler from "./middleware/notFoundHandler";
 import { authRoutes } from "./modules/auth/auth.routes";
-const app = express();
+
+const app: Application = express();
 
 app.use(express.json());
 
