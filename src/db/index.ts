@@ -35,10 +35,10 @@ const initDb = async () => {
             CREATE OR REPLACE FUNCTION update_modified_column()
             RETURNS TRIGGER AS $$
             BEGIN
-                NEW.updated_at = NOW()
+                NEW.updated_at = NOW();
                 RETURN NEW;
             END;
-            $$ language 'plpgsql';    
+            $$ LANGUAGE 'plpgsql';    
                   `);
 
   await pool.query(`

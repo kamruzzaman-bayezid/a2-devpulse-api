@@ -1,8 +1,10 @@
 import express, { type Request, type Response } from "express";
-import initDb from "./db";
+import notFound from "./middleware/notFound";
 const app = express();
 
-// health check
+app.use(express.json());
+
+// Health Check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
     status: "ok",
@@ -12,7 +14,7 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
-// initialize database
-initDb();
+// Handle Not Found Routes
+app.use(notFound);
 
 export default app;
