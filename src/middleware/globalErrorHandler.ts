@@ -13,7 +13,7 @@ export const globalErrorHandler = (
   req: Request,
   res: Response,
   _next: NextFunction,
-) => {
+): void => {
   let statusCode: number = 500;
   let message: string = "Internal Server Error";
   let errorDetails: unknown = err;
