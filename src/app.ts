@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from "express";
-import notFound from "./middleware/notFound";
+import notFoundHandler from "./middleware/notFoundHandler";
+import { authRoutes } from "./modules/auth/auth.routes";
 const app = express();
 
 app.use(express.json());
@@ -14,7 +15,10 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
+// Auth Routes
+app.use("/api/auth", authRoutes);
+
 // Handle Not Found Routes
-app.use(notFound);
+app.use(notFoundHandler);
 
 export default app;
