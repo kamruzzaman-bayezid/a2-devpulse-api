@@ -5,6 +5,7 @@ import express, {
 } from "express";
 import notFoundHandler from "./middleware/notFoundHandler";
 import { authRoutes } from "./modules/auth/auth.routes";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 const app: Application = express();
 
@@ -25,5 +26,8 @@ app.use("/api/auth", authRoutes);
 
 // Handle Not Found Routes
 app.use(notFoundHandler);
+
+// Global Error Handler
+app.use(globalErrorHandler);
 
 export default app;

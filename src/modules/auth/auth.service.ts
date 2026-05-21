@@ -1,4 +1,5 @@
 import { pool } from "../../db";
+import { AppError } from "../../utils/AppError";
 import type { IRegisterInput, TUserRole } from "./auth.types";
 import bcrypt from "bcryptjs";
 

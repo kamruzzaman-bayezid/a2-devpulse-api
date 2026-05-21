@@ -11,6 +11,8 @@ const registration = async (
     const result = await authService.registration(req.body);
     sendCreated(res, "User registered successfully", result);
   } catch (error) {
+    const err = error;
+//     console.log("Err: ", err?.message);
     next(error);
   }
 };
