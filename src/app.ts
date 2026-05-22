@@ -6,6 +6,7 @@ import express, {
 import notFoundHandler from "./middleware/notFoundHandler";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
+import { issueRoutes } from "./modules/issue/issue.routes";
 
 const app: Application = express();
 
@@ -21,8 +22,11 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
-// Auth Routes
+// Auth Related Routes
 app.use("/api/auth", authRoutes);
+
+// Issue Related Route
+app.use("/api/issues", issueRoutes);
 
 // Handle Not Found Routes
 app.use(notFoundHandler);
