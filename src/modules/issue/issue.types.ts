@@ -5,6 +5,7 @@ export interface IIssueInput {
   title: string;
   description: string;
   type: TIssueType;
+  status?: TIssueStatus;
 }
 
 export interface IIssueResponse {

@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { issueService } from "./issue.service";
 import { sendCreated, sendSuccess } from "../../utils/sendResponse";
+import type { JwtPayload } from "jsonwebtoken";
 
 const createIssueIntoDB = async (
   req: Request,
@@ -53,8 +54,27 @@ const getSingleIssueFromDb = async (
   }
 };
 
+const updateIssueFromDb = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = await issueService.updateIssueFromDb(
+      Number(req.params.id),
+      req.body,
+      req.user as JwtPayload,
+    );
+    console.log("result:", result);
+    sendSuccess(res, "Issue updated successfully", result, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const issueController = {
   createIssueIntoDB,
   getAllIssueFromDb,
   getSingleIssueFromDb,
+  updateIssueFromDb,
 };

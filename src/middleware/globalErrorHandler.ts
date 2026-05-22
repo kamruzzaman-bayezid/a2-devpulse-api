@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import { AppError } from "../utils/AppError";
 import { sendError } from "../utils/sendResponse";
+import { AppError } from "../utils/AppError";
 
 interface IPostgresError extends Error {
   code: string;
@@ -14,33 +14,51 @@ export const globalErrorHandler = (
   res: Response,
   _next: NextFunction,
 ): void => {
-  let statusCode: number = 500;
-  let message: string = "Internal Server Error";
-  let errorDetails: unknown = err;
+  let statusCode = 500;
+  let message = "Internal Server Error";
+  let errorDetails: unknown = null;
 
-  if (err instanceof AppError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    errorDetails = err.message;
-  } else if (err instanceof Error && "code" in err) {
-    const postgresErr = err as IPostgresError;
-    statusCode = 400;
-    errorDetails = {
-      detail: postgresErr.detail || null,
-      message: postgresErr.message,
-      constraint: postgresErr.constraint || null,
-    };
-
-    if (postgresErr.code === "23505") {
-      message = "This email is already registered.";
-    } else if (postgresErr.code === "23514") {
-      message = "Validation failed: Database constraint violation.";
-    } else {
-      message = "A database error occurred while processing your request.";
-    }
-  } else if (err instanceof Error) {
-    message = err.message;
+  // JSON parse error
+  if (
+    err instanceof SyntaxError &&
+    (err as any).type === "entity.parse.failed"
+  ) {
+    return sendError(
+      res,
+      "Invalid JSON format or empty request body",
+      "Request body must be valid JSON",
+      400,
+    );
   }
 
-  sendError(res, message, errorDetails, statusCode);
+  // App error
+  if (err instanceof AppError) {
+    return sendError(res, err.message, err.message, err.statusCode);
+  }
+
+  // Postgres error
+  if (typeof err === "object" && err !== null && "code" in err) {
+    const pgErr = err as IPostgresError;
+
+    statusCode = 400;
+
+    if (pgErr.code === "23505") {
+      message = "Duplicate entry";
+    } else if (pgErr.code === "23514") {
+      message = "Validation failed";
+    } else {
+      message = "Database error";
+    }
+
+    errorDetails = pgErr.detail ?? pgErr.message;
+
+    return sendError(res, message, errorDetails, statusCode);
+  }
+
+  // generic error
+  if (err instanceof Error) {
+    return sendError(res, err.message, err.message, 500);
+  }
+
+  return sendError(res, message, err, statusCode);
 };

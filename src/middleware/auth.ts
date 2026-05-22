@@ -20,7 +20,7 @@ const auth = (...roles: TUserRole[]) => {
       ]);
 
       if (isUserExist.rows.length === 0) {
-        return sendError(res, "Unauthorized Access");
+        return sendError(res, "Unauthorized Access",null,401);
       }
 
       const user = isUserExist.rows[0];
