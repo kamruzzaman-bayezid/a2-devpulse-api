@@ -12,6 +12,15 @@ router.post(
 );
 router.get("/", issueController.getAllIssueFromDb);
 router.get("/:id", issueController.getSingleIssueFromDb);
-router.patch("/:id",auth(), issueController.updateIssueFromDb);
+router.patch(
+  "/:id",
+  auth(UserRole.contributor, UserRole.maintainer),
+  issueController.updateIssueFromDb,
+);
+router.delete(
+  "/:id",
+  auth(UserRole.maintainer),
+  issueController.deleteIssueFromDb,
+);
 
 export const issueRoutes = router;
