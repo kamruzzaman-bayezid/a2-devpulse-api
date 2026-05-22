@@ -1,4 +1,5 @@
 import { pool } from "../../db";
+import { AppError } from "../../utils/AppError";
 import type { IIssueInput } from "./issue.types";
 
 const createIssueIntoDB = async (payload: IIssueInput, reporter_id: number) => {
@@ -14,17 +15,17 @@ const createIssueIntoDB = async (payload: IIssueInput, reporter_id: number) => {
 };
 
 const getAllIssueFromDb = async () => {
-  const result = await pool.query(`SELECT * FROM issues`);
-  const issues = result.rows;
+  const issueResult = await pool.query(`SELECT * FROM issues`);
+  const issues = issueResult.rows;
 
   const reporterIds = issues.map((issue) => issue.reporter_id);
   const uniqueIds = [...new Set(reporterIds)];
 
-  const result2 = await pool.query(
+  const reporterResult = await pool.query(
     `SELECT id,name,role FROM users WHERE id=ANY($1)`,
     [uniqueIds],
   );
-  const reporters = result2.rows;
+  const reporters = reporterResult.rows;
 
   const reporterMap = new Map(
     reporters.map((reporter) => [reporter.id, reporter]),
@@ -46,4 +47,40 @@ const getAllIssueFromDb = async () => {
   return issueData;
 };
 
-export const issueService = { createIssueIntoDB, getAllIssueFromDb };
+const getSingleIssueFromDb = async (id: number) => {
+  const issueResult = await pool.query(`SELECT * FROM issues WHERE id=$1`, [
+    id,
+  ]);
+
+  if (issueResult.rows.length === 0) {
+    throw new AppError("Issue not found", 404);
+  }
+
+  const issue = issueResult.rows[0] ?? null;
+
+  const reporterResult = await pool.query(
+    `SELECT id, name, role FROM users WHERE id=$1`,
+    [issue?.reporter_id],
+  );
+
+  const reporter = reporterResult.rows[0];
+
+  const issueData = {
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    type: issue.type,
+    status: issue.status,
+    reporter: reporter,
+    created_at: issue.created_at,
+    updated_at: issue.updated_at,
+  };
+
+  return issueData;
+};
+
+export const issueService = {
+  createIssueIntoDB,
+  getAllIssueFromDb,
+  getSingleIssueFromDb,
+};

@@ -27,11 +27,34 @@ const getAllIssueFromDb = async (
 
     res.status(200).json({
       success: true,
-      result,
+      data: result,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const issueController = { createIssueIntoDB, getAllIssueFromDb };
+const getSingleIssueFromDb = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = await issueService.getSingleIssueFromDb(
+      Number(req.params.id),
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const issueController = {
+  createIssueIntoDB,
+  getAllIssueFromDb,
+  getSingleIssueFromDb,
+};
