@@ -18,3 +18,30 @@ export interface IIssueResponse {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface IIssueReporter {
+  id: number;
+  name: string;
+  role: "contributor" | "maintainer";
+}
+
+export interface IIssue {
+  id: number;
+  title: string;
+  description: string;
+  type: TIssueType;
+  status: TIssueStatus;
+  reporter: IIssueReporter;
+  created_at: Date;
+  updated_at: Date;
+}
+export interface IIssueUpdate {
+  id: number;
+  title: string;
+  description: string;
+  type: TIssueType;
+  status: TIssueStatus;
+  reporter_id: number;
+  created_at: Date;
+  updated_at: Date;
+}

@@ -1,10 +1,18 @@
 import type { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../db";
 import { AppError } from "../../utils/AppError";
-import type { IIssueInput } from "./issue.types";
+import type {
+  IIssue,
+  IIssueInput,
+  IIssueResponse,
+  IIssueUpdate,
+} from "./issue.types";
 import { UserRole } from "../../types";
 
-const createIssueIntoDB = async (payload: IIssueInput, reporter_id: number) => {
+const createIssueIntoDB = async (
+  payload: IIssueInput,
+  reporter_id: number,
+): Promise<IIssueResponse> => {
   if (Object.keys(payload).length === 0) {
     throw new AppError(
       "Required fields are missing. Request body cannot be empty.",
@@ -23,9 +31,36 @@ const createIssueIntoDB = async (payload: IIssueInput, reporter_id: number) => {
   return result.rows[0];
 };
 
-const getAllIssueFromDb = async () => {
-  const issueResult = await pool.query(`SELECT * FROM issues`);
+const getAllIssueFromDb = async (
+  sort?: string,
+  type?: string,
+  status?: string,
+): Promise<IIssue[]> => {
+  const conditions: string[] = [];
+  const values: unknown[] = [];
+
+  if (type) {
+    values.push(type);
+    conditions.push(`type=$${values.length}`);
+  }
+
+  if (status) {
+    values.push(status);
+    conditions.push(`status=$${values.length}`);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const orderClause =
+    sort === "oldest" ? `ORDER BY created_at ASC` : `ORDER BY created_at DESC`;
+
+  const issueResult = await pool.query(
+    `SELECT * FROM issues ${whereClause} ${orderClause}`,
+    values,
+  );
   const issues = issueResult.rows;
+  if (issues.length === 0) return [];
 
   const reporterIds = issues.map((issue) => issue.reporter_id);
   const uniqueIds = [...new Set(reporterIds)];
@@ -56,7 +91,7 @@ const getAllIssueFromDb = async () => {
   return issueData;
 };
 
-const getSingleIssueFromDb = async (id: number) => {
+const getSingleIssueFromDb = async (id: number): Promise<IIssue> => {
   const issueResult = await pool.query(`SELECT * FROM issues WHERE id=$1`, [
     id,
   ]);
@@ -92,7 +127,7 @@ const updateIssueFromDb = async (
   id: number,
   payload: IIssueInput,
   user: JwtPayload,
-) => {
+): Promise<IIssueUpdate> => {
   // Checked is payload is empty or not
   if (Object.keys(payload).length === 0) {
     throw new AppError("Request body cannot be empty", 400);
@@ -139,7 +174,7 @@ const updateIssueFromDb = async (
   const values = keys.map((key) => payload[key as keyof IIssueInput]);
   const queryValues = [...values, id];
 
-  const setClause = keys.map((key, index) => `${key}=$${index + 1}`).join(",");
+  const setClause = keys.map((key, index) => `${key}=$${index + 1}`).join(", ");
 
   const res = await pool.query(
     `UPDATE issues SET ${setClause} WHERE id=$${queryValues.length} RETURNING *`,
@@ -149,14 +184,13 @@ const updateIssueFromDb = async (
   return res.rows[0];
 };
 
-const deleteIssueFromDb = async (id: number) => {
-  const res = await pool.query(`SELECT * FROM issues WHERE id=$1`, [id]);
-  
+const deleteIssueFromDb = async (id: number): Promise<void> => {
+  const res = await pool.query(`DELETE FROM issues WHERE id=$1 RETURNING *`, [
+    id,
+  ]);
   if (res.rows.length === 0) {
     throw new AppError("Issue not found", 404);
   }
-
-  await pool.query(`DELETE FROM issues WHERE id=$1`, [id]);
 };
 
 export const issueService = {

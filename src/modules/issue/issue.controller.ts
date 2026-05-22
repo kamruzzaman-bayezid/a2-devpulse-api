@@ -23,8 +23,14 @@ const getAllIssueFromDb = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const { sort, type, status } = req.query;
+
   try {
-    const result = await issueService.getAllIssueFromDb();
+    const result = await issueService.getAllIssueFromDb(
+      sort as string,
+      type as string,
+      status as string,
+    );
 
     res.status(200).json({
       success: true,
