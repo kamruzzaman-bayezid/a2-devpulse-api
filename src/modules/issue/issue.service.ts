@@ -68,7 +68,12 @@ const getAllIssueFromDb = async (
     values,
   );
   const issues = issueResult.rows;
-  if (issues.length === 0) return [];
+  if (issues.length === 0) {
+    throw new AppError(
+      "Issues retrieved successfully, but the list is empty.",
+      200,
+    );
+  }
 
   const reporterIds = issues.map((issue) => issue.reporter_id);
   const uniqueIds = [...new Set(reporterIds)];
@@ -105,7 +110,7 @@ const getSingleIssueFromDb = async (id: number): Promise<IIssue> => {
   ]);
 
   if (issueResult.rows.length === 0) {
-    throw new AppError("Issue not found", 404);
+    throw new AppError(`Issue with ID ${id} not found.`, 404);
   }
 
   const issue = issueResult.rows[0];
