@@ -12,14 +12,10 @@ const app: Application = express();
 
 app.use(express.json());
 
-// Health Check
-app.get("/health", (_req: Request, res: Response) => {
-  res.status(200).json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    message:
-      "A professional backend for DevPulse – Internal Tech Issue & Feature Tracker!",
-  });
+app.get("/", (_req: Request, res: Response) => {
+  res.send(
+    "A professional backend for DevPulse – Internal Tech Issue & Feature Tracker!",
+  );
 });
 
 // Auth Related Routes
