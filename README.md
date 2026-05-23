@@ -8,7 +8,7 @@ DevPulse is a backend REST API built for software teams to manage bugs and featu
 
 ## 🌐 Live URL
 
-🔗 https://your-live-url.com
+🔗 [https://your-live-url.com](https://a2-devpulse-api.vercel.app/)
 
 ---
 
@@ -64,7 +64,7 @@ DevPulse is a backend REST API built for software teams to manage bugs and featu
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/devpulse.git
+git clone https://github.com/kamruzzaman-bayezid/a2-devpulse-api.git
 ```
 
 ### 2. Navigate Project
