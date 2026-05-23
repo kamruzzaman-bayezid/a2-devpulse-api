@@ -85,7 +85,7 @@ const deleteIssueFromDb = async (
   try {
     await issueService.deleteIssueFromDb(Number(req.params.id));
     res.status(200).json({
-      success: false,
+      success: true,
       message: "Issue deleted successfully",
     });
   } catch (error) {

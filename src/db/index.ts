@@ -56,6 +56,8 @@ const initDb = async () => {
             FOR EACH ROW
             EXECUTE PROCEDURE update_modified_column();
   `);
+
+  console.log("Database connected successfully!");
 };
 
 export default initDb;

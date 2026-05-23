@@ -21,6 +21,14 @@ const createIssueIntoDB = async (
   }
 
   const { title, description, type } = payload;
+
+  if (type && !["bug", "feature_request"].includes(type)) {
+    throw new AppError(
+      "Invalid issue type. Allowed values are 'bug' or 'feature_request'.",
+      400,
+    );
+  }
+
   const result = await pool.query(
     `
             INSERT INTO issues (title, description, type, reporter_id) VALUES ($1, $2, $3, $4) RETURNING *

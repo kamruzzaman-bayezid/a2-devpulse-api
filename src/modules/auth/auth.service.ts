@@ -39,9 +39,13 @@ const login = async (payload: ILoginInput) => {
 
   const user = result.rows[0];
 
+  if (!user) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
   const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-  if (!user || !isPasswordMatch) {
+  if (!isPasswordMatch) {
     throw new AppError("Invalid email or password", 401);
   }
 
@@ -53,7 +57,7 @@ const login = async (payload: ILoginInput) => {
 
   const token = jwt.sign(userData, config.jwt_secret, {
     expiresIn: config.jwt_expires_in,
-  } as SignOptions);
+  });
 
   const { password: _, ...userWithOutPassword } = user;
 

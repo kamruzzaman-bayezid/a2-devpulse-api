@@ -10,7 +10,12 @@ const auth = (...roles: TUserRole[]) => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        return sendError(res, "Unauthorized Access", null, 401);
+        return sendError(
+          res,
+          "Unauthorized Access",
+          "Authentication required",
+          401,
+        );
       }
 
       const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload;
@@ -20,13 +25,23 @@ const auth = (...roles: TUserRole[]) => {
       ]);
 
       if (isUserExist.rows.length === 0) {
-        return sendError(res, "Unauthorized Access",null,401);
+        return sendError(
+          res,
+          "Unauthorized Access",
+          "Authentication failed",
+          401,
+        );
       }
 
       const user = isUserExist.rows[0];
 
       if (roles.length && !roles.includes(user.role)) {
-        return sendError(res, "Forbidden Access", null, 403);
+        return sendError(
+          res,
+          "Forbidden Access",
+          "Insufficient permissions",
+          403,
+        );
       }
 
       req.user = decoded;

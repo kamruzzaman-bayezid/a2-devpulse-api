@@ -1,11 +1,18 @@
 import type { NextFunction, Request, Response } from "express";
 import { sendError } from "../utils/sendResponse";
 import { AppError } from "../utils/AppError";
+import jwt from "jsonwebtoken";
+
+const { JsonWebTokenError, TokenExpiredError } = jwt;
 
 interface IPostgresError extends Error {
   code: string;
   detail?: string;
   constraint?: string;
+}
+
+interface IBodyParserError extends SyntaxError {
+  type?: string;
 }
 
 export const globalErrorHandler = (
@@ -21,7 +28,10 @@ export const globalErrorHandler = (
   // JSON parse error
   if (
     err instanceof SyntaxError &&
-    (err as any).type === "entity.parse.failed"
+    typeof err === "object" &&
+    err !== null &&
+    "type" in err &&
+    (err as IBodyParserError).type === "entity.parse.failed"
   ) {
     return sendError(
       res,
@@ -29,6 +39,14 @@ export const globalErrorHandler = (
       "Request body must be valid JSON",
       400,
     );
+  }
+
+  // jwt & token error
+  if (err instanceof TokenExpiredError) {
+    return sendError(res, "Token has expired", null, 401);
+  }
+  if (err instanceof JsonWebTokenError) {
+    return sendError(res, "Invalid token", null, 401);
   }
 
   // App error
