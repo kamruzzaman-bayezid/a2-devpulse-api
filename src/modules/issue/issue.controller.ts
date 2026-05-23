@@ -31,7 +31,9 @@ const getAllIssueFromDb = async (
       type as string,
       status as string,
     );
-
+    if (result.length === 0) {
+      return sendSuccess(res, "Issues fetched successfully", [], 200);
+    }
     res.status(200).json({
       success: true,
       data: result,

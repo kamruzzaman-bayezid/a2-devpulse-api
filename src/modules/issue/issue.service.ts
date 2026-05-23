@@ -8,6 +8,7 @@ import type {
   IIssueUpdate,
 } from "./issue.types";
 import { UserRole } from "../../types";
+import { sendSuccess } from "../../utils/sendResponse";
 
 const createIssueIntoDB = async (
   payload: IIssueInput,
@@ -68,12 +69,7 @@ const getAllIssueFromDb = async (
     values,
   );
   const issues = issueResult.rows;
-  if (issues.length === 0) {
-    throw new AppError(
-      "Issues retrieved successfully, but the list is empty.",
-      200,
-    );
-  }
+  if (issues.length === 0) return [];
 
   const reporterIds = issues.map((issue) => issue.reporter_id);
   const uniqueIds = [...new Set(reporterIds)];
